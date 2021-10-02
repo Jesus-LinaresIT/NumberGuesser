@@ -13,6 +13,14 @@ let min = 1,
    winningNum = getRandomNumb(min, max),
    guessesLeft = 3;
 
+const styleB = {
+   assignClsDan: 'alert alert-danger',
+   assignClsWar: 'alert alert-warning',
+   assignClsSuc: 'alert alert-success',
+   assignBorS: "border border-success",
+   assignBorD: "border border-danger"
+};
+
 // UI Elements
 const gameElem = document.querySelector('#game'),
    minNum = document.querySelector('.min-num'),
@@ -25,6 +33,7 @@ const gameElem = document.querySelector('#game'),
 minNum.textContent = min;
 maxNum.textContent = max;
 
+// Event play again
 gameElem.addEventListener('mousedown', (e) => {
    let playAgain = e.target.className;
    if(playAgain === 'play-again') {
@@ -34,57 +43,54 @@ gameElem.addEventListener('mousedown', (e) => {
 
 // Liste for guess
 guessBtn.addEventListener('click', ()=>{
-   let guess = parseInt(guessInput.value);
-   let assignCls;
+   let messCls = {
+      guess: parseInt(guessInput.value),
+      msgFil: `Please enter a number between ${min} and ${max}`,
+      msgLose: `Game over, you lost. The correct number was ${winningNum}`,
+      msgWon: `Congratulation ${winningNum} is a number correct!`
+   };
+   const {guess, msgFil,
+      msgLose, msgWon} = messCls;
+
    // Validate
    if(guess < min || guess > max || isNaN(guess)){
-      let msg = `Please enter a number between ${min} and ${max}`;
-      assignCls = 'alert alert-danger';
-      setMessage(msg, assignCls);
+      setMessage(msgFil, styleB.assignClsDan);
    }else{
       // Check if won
       if(guess !== winningNum){
          // Wrong number
          guessesLeft -= 1;
 
-         if(guessesLeft === 0){
+         if(guessesLeft <= 0){
             // Game Over - lost
-            let msg = `Game over, you lost. The correct number was ${winningNum}`;
-            gameOver(false, msg);
+            gameOver(false, msgLose);
          }else{
             // Game continues - answer wrong
-            let assignCls = 'alert alert-warning';
-            setMessage(`${guess} is not correct, ${guessesLeft} guesses left`, assignCls);
+            setMessage(`${guess} is not correct, ${guessesLeft} guesses left`, styleB.assignClsWar);
             guessInput.value = '';
          }
       }else{
          // Game Over - won
-         let msg = `Congratulation ${winningNum} is a number correct!`;
-         gameOver(true, msg)
+         gameOver(true, msgWon)
       }
    }
 });
 
 // Game Over
 function gameOver(won, msg){
-   let assignCls;
-   if(won === true){
-      assignCls='alert alert-success';
+   if(won){
       guessInput.disabled = true;
       // Change border color
-      guessInput.className = "border border-success";
-      setMessage(msg, assignCls);
-
+      guessInput.className = styleB.assignBorS;
+      setMessage(msg, styleB.assignClsSuc);
       // Play again?
       guessBtn.value = 'Play Again'
       guessBtn.className += 'play-again'
    }else{
-      assignCls='alert alert-danger';
       guessInput.disabled = true;
       // Change border color
-      guessInput.className = "border border-danger";
-      setMessage(msg, assignCls);
-
+      guessInput.className = styleB.assignBorD;
+      setMessage(msg, styleB.assignClsDan);
       // Play again?
       guessBtn.value = 'Play Again'
       guessBtn.className += 'play-again'
@@ -101,4 +107,3 @@ function setMessage(msg, assignCls){
    message.className = assignCls;
    message.textContent = msg;
 }
-
